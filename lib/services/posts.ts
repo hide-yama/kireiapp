@@ -10,6 +10,8 @@ export class PostService {
    * 投稿一覧を効率的に取得（N+1問題を解決）
    */
   async getPosts(query: PostsQuery = {}): Promise<{ data: PostWithDetails[] | null; error: unknown }> {
+    console.log('PostService.getPosts called with query:', query)
+    
     try {
       let baseQuery = this.supabase
         .from('posts')
@@ -39,31 +41,41 @@ export class PostService {
         `)
         .order('created_at', { ascending: false })
 
+      console.log('Base query created')
+
       // フィルタリング
       if (query.group_ids && query.group_ids.length > 0) {
+        console.log('Filtering by group_ids:', query.group_ids)
         baseQuery = baseQuery.in('group_id', query.group_ids)
       }
 
       if (query.category) {
+        console.log('Filtering by category:', query.category)
         baseQuery = baseQuery.eq('category', query.category)
       }
 
       if (query.user_id) {
+        console.log('Filtering by user_id:', query.user_id)
         baseQuery = baseQuery.eq('user_id', query.user_id)
       }
 
       // ページネーション
       if (query.limit) {
+        console.log('Limiting to:', query.limit)
         baseQuery = baseQuery.limit(query.limit)
       }
 
       if (query.offset) {
+        console.log('Offset:', query.offset)
         baseQuery = baseQuery.range(query.offset, query.offset + (query.limit || 20) - 1)
       }
 
+      console.log('Executing query...')
       const { data, error } = await baseQuery
+      console.log('Query result:', { data: data?.length || 0, error })
 
       if (error) {
+        console.error('Query error details:', error)
         return { data: null, error }
       }
 
@@ -80,8 +92,10 @@ export class PostService {
         comment_count: 0 // 別途取得する
       })) as PostWithDetails[]
 
+      console.log('Posts processed successfully:', postsWithUrls.length)
       return { data: postsWithUrls, error: null }
     } catch (error) {
+      console.error('PostService.getPosts catch error:', error)
       return { data: null, error }
     }
   }
@@ -148,6 +162,8 @@ export class PostService {
    * ユーザーが参加しているグループのIDを効率的に取得
    */
   async getUserGroupIds(userId: string): Promise<{ data: string[] | null; error: unknown }> {
+    console.log('PostService.getUserGroupIds called for user:', userId)
+    
     try {
       // 所有グループと参加グループを並行取得
       const [ownedResult, memberResult] = await Promise.all([
@@ -161,7 +177,13 @@ export class PostService {
           .eq('user_id', userId)
       ])
 
+      console.log('Group query results:', {
+        owned: { data: ownedResult.data, error: ownedResult.error },
+        member: { data: memberResult.data, error: memberResult.error }
+      })
+
       if (ownedResult.error && memberResult.error) {
+        console.error('Both group queries failed:', { ownedResult, memberResult })
         return { data: null, error: ownedResult.error }
       }
 
@@ -171,8 +193,15 @@ export class PostService {
       // 重複を除去
       const allGroupIds = Array.from(new Set([...ownedGroupIds, ...memberGroupIds]))
 
+      console.log('User group IDs result:', {
+        owned: ownedGroupIds,
+        member: memberGroupIds,
+        combined: allGroupIds
+      })
+
       return { data: allGroupIds, error: null }
     } catch (error) {
+      console.error('PostService.getUserGroupIds catch error:', error)
       return { data: null, error }
     }
   }
