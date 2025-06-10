@@ -1,45 +1,23 @@
+import React, { memo } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LikeButton } from "@/components/interactions/LikeButton"
 import { MessageCircle } from "lucide-react"
+import { PostWithDetails } from "@/types/domain"
+import { formatDate, getCategoryColor, isValidImageUrl } from "@/lib/utils"
 
 interface PostCardProps {
-  post: {
-    id: string
-    body: string
-    category: string
-    place?: string
-    created_at: string
-    user_id: string
-    profiles: {
-      nickname: string
-      avatar_url?: string
-    }
-    post_images: {
-      id: string
-      storage_path: string
-      position: number
-    }[]
-    likes?: { count: number }[]
-    comments?: { count: number }[]
-  }
+  post: PostWithDetails
   currentUserId?: string
 }
 
-export function PostCard({ post, currentUserId }: PostCardProps) {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("ja-JP", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-  }
-
-  const firstImage = post.post_images
-    .sort((a, b) => a.position - b.position)[0]
+const PostCardComponent = ({ post, currentUserId }: PostCardProps) => {
+  // 最初の画像を取得（既にソート済みの場合）
+  const firstImage = post.post_images?.[0]
+  
+  // 画像URLの安全性チェック
+  const safeImageUrl = firstImage?.url && isValidImageUrl(firstImage.url) ? firstImage.url : null
 
   return (
     <Card>
@@ -67,7 +45,7 @@ export function PostCard({ post, currentUserId }: PostCardProps) {
             </div>
           </div>
           <div className="flex gap-2">
-            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+            <span className={`px-2 py-1 rounded text-xs ${getCategoryColor(post.category)}`}>
               {post.category}
             </span>
             {post.place && (
@@ -81,16 +59,21 @@ export function PostCard({ post, currentUserId }: PostCardProps) {
       <CardContent>
         <p className="mb-4 whitespace-pre-wrap line-clamp-3">{post.body}</p>
         
-        {firstImage && (
+        {safeImageUrl && (
           <div className="mb-4">
             <div className="aspect-square max-w-[300px] mx-auto">
               <img
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/post-images/${firstImage.storage_path}`}
+                src={safeImageUrl}
                 alt="投稿画像"
                 className="w-full h-full object-cover rounded border"
+                loading="lazy" // 遅延読み込み
+                onError={(e) => {
+                  // エラー時はデフォルト画像または非表示
+                  e.currentTarget.style.display = 'none'
+                }}
               />
             </div>
-            {post.post_images.length > 1 && (
+            {post.post_images && post.post_images.length > 1 && (
               <p className="text-xs text-gray-500 mt-1 text-center">
                 +{post.post_images.length - 1}枚の画像
               </p>
@@ -102,13 +85,13 @@ export function PostCard({ post, currentUserId }: PostCardProps) {
           <div className="flex items-center space-x-4">
             <LikeButton
               postId={post.id}
-              initialLikeCount={post.likes?.[0]?.count || 0}
+              initialLikeCount={post.like_count || 0}
               userId={currentUserId}
             />
             <Button variant="ghost" size="sm" asChild>
               <Link href={`/posts/${post.id}`} className="flex items-center space-x-2">
                 <MessageCircle className="h-5 w-5" />
-                <span>{post.comments?.[0]?.count || 0}</span>
+                <span>{post.comment_count || 0}</span>
               </Link>
             </Button>
           </div>
@@ -122,3 +105,6 @@ export function PostCard({ post, currentUserId }: PostCardProps) {
     </Card>
   )
 }
+
+// React.memoで最適化
+export const PostCard = memo(PostCardComponent)

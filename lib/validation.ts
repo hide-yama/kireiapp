@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { PostCategory, isValidPostCategory } from "@/types/domain"
 
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
   switch (issue.code) {
@@ -74,7 +75,37 @@ export const groupNameSchema = z
 export const invitationCodeSchema = z
   .string()
   .min(1, "招待コードを入力してください")
-  .length(6, "招待コードは6文字です")
+  .length(8, "招待コードは8文字です")
+  .regex(/^[A-Z0-9]+$/, "招待コードは大文字と数字のみです")
+
+export const postBodySchema = z
+  .string()
+  .min(1, "投稿内容を入力してください")
+  .max(1000, "投稿内容は1000文字以下で入力してください")
+
+export const postCategorySchema = z
+  .string()
+  .refine(isValidPostCategory, "有効なカテゴリを選択してください")
+  .transform((val) => val as PostCategory)
+
+export const postPlaceSchema = z
+  .string()
+  .max(50, "場所は50文字以下で入力してください")
+  .optional()
+
+export const commentContentSchema = z
+  .string()
+  .min(1, "コメントを入力してください")
+  .max(500, "コメントは500文字以下で入力してください")
+
+export const fileSchema = z
+  .any()
+  .refine((file) => file instanceof File, "ファイルを選択してください")
+  .refine((file) => file.size <= 5 * 1024 * 1024, "ファイルサイズは5MB以下にしてください")
+  .refine(
+    (file) => ['image/jpeg', 'image/png', 'image/webp'].includes(file.type),
+    "JPEG、PNG、WebP形式の画像ファイルのみサポートしています"
+  )
 
 // 認証フォームスキーマ
 export const signUpSchema = z
@@ -108,8 +139,39 @@ export const joinGroupSchema = z.object({
   invitationCode: invitationCodeSchema,
 })
 
+export const createPostSchema = z.object({
+  body: postBodySchema,
+  category: postCategorySchema,
+  place: postPlaceSchema,
+  group_id: z.string().uuid("有効なグループを選択してください"),
+  images: z.array(fileSchema).max(4, "画像は最大4枚まで添付できます").optional()
+})
+
+export const updatePostSchema = z.object({
+  body: postBodySchema.optional(),
+  category: postCategorySchema.optional(),
+  place: postPlaceSchema.optional(),
+})
+
+export const createCommentSchema = z.object({
+  post_id: z.string().uuid("有効な投稿を選択してください"),
+  content: commentContentSchema,
+})
+
+// サーバーサイド用バリデーション
+export const serverCreatePostSchema = z.object({
+  body: postBodySchema,
+  category: z.string().refine(isValidPostCategory, "有効なカテゴリを選択してください"),
+  place: z.string().max(50).optional(),
+  group_id: z.string().uuid("有効なグループIDが必要です"),
+})
+
 export type SignUpFormData = z.infer<typeof signUpSchema>
 export type SignInFormData = z.infer<typeof signInSchema>
 export type ProfileFormData = z.infer<typeof profileSchema>
 export type CreateGroupFormData = z.infer<typeof createGroupSchema>
 export type JoinGroupFormData = z.infer<typeof joinGroupSchema>
+export type CreatePostFormData = z.infer<typeof createPostSchema>
+export type UpdatePostFormData = z.infer<typeof updatePostSchema>
+export type CreateCommentFormData = z.infer<typeof createCommentSchema>
+export type ServerCreatePostData = z.infer<typeof serverCreatePostSchema>

@@ -1,7 +1,16 @@
 import { createClient } from '@/lib/supabase/client'
 import { APIError, NetworkError, handleError } from '@/lib/error-handler'
+import { 
+  Profile, 
+  FamilyGroup, 
+  FamilyMember, 
+  User,
+  UpdateProfileRequest,
+  CreateGroupRequest 
+} from '@/types/domain'
+import type { AuthResponse } from '@supabase/supabase-js'
 
-export type APIResponse<T> = {
+export interface APIResponse<T> {
   data: T | null
   error: APIError | null
   success: boolean
@@ -10,34 +19,36 @@ export type APIResponse<T> = {
 class APIClient {
   private supabase = createClient()
 
-  private handleSupabaseError(error: any): APIError {
+  private handleSupabaseError(error: unknown): APIError {
     // Supabaseのエラー詳細をログに出力
+    const errorObj = error as { message?: string; code?: string; hint?: string; details?: string }
     console.log('Supabase error details:', {
-      message: error?.message,
-      code: error?.code,
-      hint: error?.hint,
-      details: error?.details,
+      message: errorObj?.message,
+      code: errorObj?.code,
+      hint: errorObj?.hint,
+      details: errorObj?.details,
       full: error
     })
     
-    const message = error?.message || 'Unknown database error'
-    const code = error?.code || 'SUPABASE_ERROR'
+    const message = errorObj?.message || 'Unknown database error'
+    const code = errorObj?.code || 'SUPABASE_ERROR'
     const status = this.getStatusFromError(error)
     
     return new APIError(message, code, status, error)
   }
 
-  private getStatusFromError(error: any): number {
-    if (error?.status) return error.status
-    if (error?.code === 'PGRST116') return 406 // Not acceptable
-    if (error?.code === 'PGRST202') return 404 // Not found
-    if (error?.code === 'PGRST204') return 409 // Conflict
-    if (error?.code?.startsWith('23')) return 400 // Database constraint violation
+  private getStatusFromError(error: unknown): number {
+    const errorObj = error as { status?: number; code?: string }
+    if (errorObj?.status) return errorObj.status
+    if (errorObj?.code === 'PGRST116') return 406 // Not acceptable
+    if (errorObj?.code === 'PGRST202') return 404 // Not found
+    if (errorObj?.code === 'PGRST204') return 409 // Conflict
+    if (errorObj?.code?.startsWith('23')) return 400 // Database constraint violation
     return 500
   }
 
   private async executeQuery<T>(
-    queryFn: () => Promise<any>,
+    queryFn: () => Promise<{ data: T | null; error: unknown }>,
     options?: {
       showToast?: boolean
       fallbackMessage?: string
@@ -89,8 +100,8 @@ class APIClient {
   }
 
   // Auth methods
-  async signUp(email: string, password: string, metadata?: Record<string, any>) {
-    return this.executeQuery(
+  async signUp(email: string, password: string, metadata?: Record<string, unknown>): Promise<APIResponse<AuthResponse>> {
+    return this.executeQuery<AuthResponse>(
       () => this.supabase.auth.signUp({
         email,
         password,
@@ -100,30 +111,30 @@ class APIClient {
     )
   }
 
-  async signIn(email: string, password: string) {
-    return this.executeQuery(
+  async signIn(email: string, password: string): Promise<APIResponse<AuthResponse>> {
+    return this.executeQuery<AuthResponse>(
       () => this.supabase.auth.signInWithPassword({ email, password }),
       { fallbackMessage: 'ログインに失敗しました' }
     )
   }
 
-  async signOut() {
-    return this.executeQuery(
+  async signOut(): Promise<APIResponse<void>> {
+    return this.executeQuery<void>(
       () => this.supabase.auth.signOut(),
       { fallbackMessage: 'ログアウトに失敗しました' }
     )
   }
 
-  async getCurrentUser() {
-    return this.executeQuery(
+  async getCurrentUser(): Promise<APIResponse<{ user: User | null }>> {
+    return this.executeQuery<{ user: User | null }>(
       () => this.supabase.auth.getUser(),
       { showToast: false }
     )
   }
 
   // Profile methods
-  async getProfile(userId: string) {
-    return this.executeQuery(
+  async getProfile(userId: string): Promise<APIResponse<Profile>> {
+    return this.executeQuery<Profile>(
       () => this.supabase
         .from('profiles')
         .select('*')
@@ -133,8 +144,8 @@ class APIClient {
     )
   }
 
-  async updateProfile(userId: string, updates: any) {
-    return this.executeQuery(
+  async updateProfile(userId: string, updates: Partial<UpdateProfileRequest>): Promise<APIResponse<Profile>> {
+    return this.executeQuery<Profile>(
       () => this.supabase
         .from('profiles')
         .update(updates)
@@ -145,8 +156,8 @@ class APIClient {
     )
   }
 
-  async createProfile(profile: any) {
-    return this.executeQuery(
+  async createProfile(profile: Omit<Profile, 'created_at' | 'updated_at'>): Promise<APIResponse<Profile>> {
+    return this.executeQuery<Profile>(
       () => this.supabase
         .from('profiles')
         .insert(profile)
@@ -157,8 +168,8 @@ class APIClient {
   }
 
   // Group methods
-  async getGroups(userId: string) {
-    return this.executeQuery(
+  async getGroups(userId: string): Promise<APIResponse<FamilyMember[]>> {
+    return this.executeQuery<FamilyMember[]>(
       () => this.supabase
         .from('family_members')
         .select(`
@@ -170,8 +181,8 @@ class APIClient {
     )
   }
 
-  async createGroup(group: any) {
-    return this.executeQuery(
+  async createGroup(group: Omit<FamilyGroup, 'id' | 'created_at' | 'updated_at'>): Promise<APIResponse<FamilyGroup>> {
+    return this.executeQuery<FamilyGroup>(
       () => this.supabase
         .from('family_groups')
         .insert(group)
@@ -181,14 +192,14 @@ class APIClient {
     )
   }
 
-  async joinGroup(groupId: string, userId: string) {
-    return this.executeQuery(
+  async joinGroup(groupId: string, userId: string): Promise<APIResponse<FamilyMember>> {
+    return this.executeQuery<FamilyMember>(
       () => this.supabase
         .from('family_members')
         .insert({
           group_id: groupId,
           user_id: userId,
-          role: 'member'
+          role: 'member' as const
         })
         .select()
         .single(),
@@ -196,8 +207,8 @@ class APIClient {
     )
   }
 
-  async getGroupByInvitationCode(code: string) {
-    return this.executeQuery(
+  async getGroupByInvitationCode(code: string): Promise<APIResponse<FamilyGroup>> {
+    return this.executeQuery<FamilyGroup>(
       () => this.supabase
         .from('family_groups')
         .select('*')
@@ -209,7 +220,7 @@ class APIClient {
 
   // Generic query method for custom queries
   async query<T>(
-    queryFn: () => Promise<any>,
+    queryFn: () => Promise<{ data: T | null; error: unknown }>,
     options?: {
       showToast?: boolean
       fallbackMessage?: string

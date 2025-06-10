@@ -2,26 +2,27 @@
 
 import { useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 
-interface UseRealtimeSubscriptionProps {
+interface UseRealtimeSubscriptionProps<T = Record<string, unknown>> {
   table: string
   filter?: string
-  onInsert?: (payload: any) => void
-  onUpdate?: (payload: any) => void
-  onDelete?: (payload: any) => void
+  onInsert?: (payload: RealtimePostgresChangesPayload<T>) => void
+  onUpdate?: (payload: RealtimePostgresChangesPayload<T>) => void
+  onDelete?: (payload: RealtimePostgresChangesPayload<T>) => void
 }
 
-export function useRealtimeSubscription({
+export function useRealtimeSubscription<T = Record<string, unknown>>({
   table,
   filter,
   onInsert,
   onUpdate,
   onDelete
-}: UseRealtimeSubscriptionProps) {
+}: UseRealtimeSubscriptionProps<T>) {
   const supabase = createClient()
 
   useEffect(() => {
-    let subscription: any
+    let subscription: ReturnType<typeof supabase.channel> | null = null
 
     const setupSubscription = async () => {
       try {
@@ -40,7 +41,7 @@ export function useRealtimeSubscription({
               table: table,
               ...(filter && { filter })
             },
-            (payload) => {
+            (payload: RealtimePostgresChangesPayload<T>) => {
               switch (payload.eventType) {
                 case 'INSERT':
                   onInsert?.(payload)
