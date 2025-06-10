@@ -22,12 +22,12 @@ export class PostService {
           user_id,
           created_at,
           updated_at,
-          profile:profiles!posts_user_id_fkey (
+          profiles (
             id,
             nickname,
             avatar_url
           ),
-          group:family_groups!posts_group_id_fkey (
+          family_groups (
             id,
             name
           ),
@@ -35,12 +35,6 @@ export class PostService {
             id,
             storage_path,
             position
-          ),
-          likes:post_likes (
-            count
-          ),
-          comments:post_comments (
-            count
           )
         `)
         .order('created_at', { ascending: false })
@@ -76,12 +70,14 @@ export class PostService {
       // データを変換してURLを追加
       const postsWithUrls = (data || []).map(post => ({
         ...post,
+        profile: post.profiles,
+        group: post.family_groups,
         post_images: post.post_images?.map(image => ({
           ...image,
           url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/post-images/${image.storage_path}`
         })) || [],
-        like_count: post.likes?.[0]?.count || 0,
-        comment_count: post.comments?.[0]?.count || 0
+        like_count: 0, // 別途取得する
+        comment_count: 0 // 別途取得する
       })) as PostWithDetails[]
 
       return { data: postsWithUrls, error: null }
@@ -106,12 +102,12 @@ export class PostService {
           user_id,
           created_at,
           updated_at,
-          profile:profiles!posts_user_id_fkey (
+          profiles (
             id,
             nickname,
             avatar_url
           ),
-          group:family_groups!posts_group_id_fkey (
+          family_groups (
             id,
             name
           ),
@@ -119,14 +115,7 @@ export class PostService {
             id,
             storage_path,
             position
-          ),
-          likes:post_likes (
-            count
-          ),
-          comments:post_comments (
-            count
           )
-          ${userId ? `, user_likes:post_likes!post_likes_user_id_fkey(user_id)` : ''}
         `)
         .eq('id', postId)
         .single()
@@ -138,13 +127,15 @@ export class PostService {
       // データを変換
       const postWithDetails = {
         ...data,
+        profile: data.profiles,
+        group: data.family_groups,
         post_images: data.post_images?.map(image => ({
           ...image,
           url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/post-images/${image.storage_path}`
         })) || [],
-        like_count: data.likes?.[0]?.count || 0,
-        comment_count: data.comments?.[0]?.count || 0,
-        is_liked: userId ? data.user_likes?.some((like: any) => like.user_id === userId) : false
+        like_count: 0, // 別途取得
+        comment_count: 0, // 別途取得
+        is_liked: false // 別途取得
       } as PostWithDetails
 
       return { data: postWithDetails, error: null }
@@ -196,7 +187,7 @@ export class PostService {
         .from('family_members')
         .select(`
           group_id,
-          family_groups!family_members_group_id_fkey (
+          family_groups (
             id,
             name
           )
@@ -236,30 +227,6 @@ export class PostService {
     }
   }
 
-  /**
-   * いいね数を効率的に取得
-   */
-  async getLikeCounts(postIds: string[]): Promise<{ data: Record<string, number> | null; error: unknown }> {
-    try {
-      const { data, error } = await this.supabase
-        .from('post_likes')
-        .select('post_id, count(*)')
-        .in('post_id', postIds)
-
-      if (error) {
-        return { data: null, error }
-      }
-
-      const likeCounts = (data || []).reduce((acc, item) => {
-        acc[item.post_id] = item.count
-        return acc
-      }, {} as Record<string, number>)
-
-      return { data: likeCounts, error: null }
-    } catch (error) {
-      return { data: null, error }
-    }
-  }
 }
 
 export const postService = new PostService()
