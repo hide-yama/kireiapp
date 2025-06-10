@@ -12,25 +12,21 @@ export interface Profile {
   nickname: string
   avatar_url?: string
   created_at: string
-  updated_at: string
 }
 
 export interface FamilyGroup {
   id: string
   name: string
-  description?: string
-  image_url?: string
+  avatar_url?: string
   invitation_code: string
   owner_id: string
   created_at: string
-  updated_at: string
   // Relations
   owner?: Profile
   members?: FamilyMember[]
 }
 
 export interface FamilyMember {
-  id: string
   group_id: string
   user_id: string
   role: 'owner' | 'member'
@@ -48,7 +44,6 @@ export interface Post {
   group_id: string
   user_id: string
   created_at: string
-  updated_at: string
   // Relations
   group?: FamilyGroup
   profile?: Profile
@@ -72,7 +67,6 @@ export interface PostImage {
 }
 
 export interface Like {
-  id: string
   post_id: string
   user_id: string
   created_at: string
@@ -84,9 +78,9 @@ export interface Comment {
   id: string
   post_id: string
   user_id: string
-  content: string
+  body: string
   created_at: string
-  updated_at: string
+  is_deleted: boolean
   // Relations
   profile?: Profile
 }
@@ -95,26 +89,22 @@ export interface Notification {
   id: string
   user_id: string
   type: NotificationType
-  title: string
-  content: string
-  related_post_id?: string
-  related_group_id?: string
-  is_read: boolean
+  post_id: string | null
+  from_user_id: string | null
+  read: boolean
   created_at: string
   // Relations
   related_post?: Post
-  related_group?: FamilyGroup
+  from_user?: Profile
 }
 
 // Enums
 export type PostCategory = '料理' | '掃除' | '洗濯' | '買い物' | 'その他'
 
 export type NotificationType = 
-  | 'new_post' 
-  | 'new_like' 
-  | 'new_comment' 
-  | 'group_joined' 
-  | 'group_invitation'
+  | 'like' 
+  | 'comment' 
+  | 'post'
 
 // API Response types
 export interface ApiResponse<T> {
@@ -165,7 +155,7 @@ export interface UpdateProfileRequest {
 
 export interface CreateCommentRequest {
   post_id: string
-  content: string
+  body: string
 }
 
 // Query types
@@ -178,7 +168,7 @@ export interface PostsQuery {
 }
 
 export interface NotificationsQuery {
-  is_read?: boolean
+  read?: boolean
   type?: NotificationType
   limit?: number
   offset?: number
@@ -190,7 +180,7 @@ export const isValidPostCategory = (category: string): category is PostCategory 
 }
 
 export const isValidNotificationType = (type: string): type is NotificationType => {
-  return ['new_post', 'new_like', 'new_comment', 'group_joined', 'group_invitation'].includes(type)
+  return ['like', 'comment', 'post'].includes(type)
 }
 
 // Utility types

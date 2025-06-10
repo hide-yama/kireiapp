@@ -61,7 +61,7 @@ export function GroupImageUpload({ onUploadComplete, currentImageUrl }: GroupIma
     } catch (error: any) {
       console.error('Error uploading group image:', error)
       
-      let errorMessage = 'グループ画像のアップロードに失敗しました'
+      let errorMessage = 'グループアイコンのアップロードに失敗しました'
       
       if (error?.message) {
         errorMessage = error.message
@@ -97,17 +97,17 @@ export function GroupImageUpload({ onUploadComplete, currentImageUrl }: GroupIma
 
   return (
     <div className="space-y-4">
-      <Label>グループ画像（任意）</Label>
+      <Label>グループアイコン（任意）</Label>
       <div className="flex items-center space-x-4">
         <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
           {preview ? (
             <img
               src={preview}
-              alt="Group image preview"
+              alt="Group icon preview"
               className="w-20 h-20 rounded-lg object-cover"
             />
           ) : (
-            <span className="text-gray-500 text-sm">画像なし</span>
+            <span className="text-gray-500 text-sm">アイコンなし</span>
           )}
         </div>
         <div>
@@ -117,7 +117,7 @@ export function GroupImageUpload({ onUploadComplete, currentImageUrl }: GroupIma
             onClick={handleButtonClick}
             disabled={uploading}
           >
-            {uploading ? 'アップロード中...' : '画像を選択'}
+            {uploading ? 'アップロード中...' : 'アイコンを選択'}
           </Button>
           <p className="text-sm text-gray-500 mt-1">
             JPEG, PNG, WebP / 最大5MB

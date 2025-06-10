@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar'
 import { Card, CardContent } from '@/components/ui/card'
 import { Heart, MessageCircle, FileText } from 'lucide-react'
+import { useNotification } from '@/contexts/NotificationContext'
 
 interface NotificationCardProps {
   notification: {
@@ -25,6 +27,8 @@ interface NotificationCardProps {
 }
 
 export function NotificationCard({ notification, onMarkAsRead }: NotificationCardProps) {
+  const [isRead, setIsRead] = useState(notification.read)
+  const { decrementUnreadCount } = useNotification()
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
@@ -73,8 +77,10 @@ export function NotificationCard({ notification, onMarkAsRead }: NotificationCar
     }
   }
 
-  const handleClick = () => {
-    if (!notification.read) {
+  const handleClick = (e: React.MouseEvent) => {
+    if (!isRead) {
+      setIsRead(true)
+      decrementUnreadCount()  // 即座に通知数を減らす
       onMarkAsRead?.()
     }
   }
@@ -82,7 +88,7 @@ export function NotificationCard({ notification, onMarkAsRead }: NotificationCar
   return (
     <Card 
       className={`transition-colors hover:bg-gray-50 cursor-pointer ${
-        !notification.read ? 'border-blue-200 bg-blue-50' : ''
+        !isRead ? 'border-l-4 border-l-blue-500 bg-blue-50 shadow-sm' : 'border-gray-200'
       }`}
     >
       <CardContent className="p-4">
@@ -105,7 +111,7 @@ export function NotificationCard({ notification, onMarkAsRead }: NotificationCar
                 <p className="text-sm font-medium text-gray-900">
                   {getNotificationText()}
                 </p>
-                {!notification.read && (
+                {!isRead && (
                   <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
                 )}
               </div>

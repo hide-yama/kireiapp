@@ -25,20 +25,20 @@ const PostCardComponent = ({ post, currentUserId }: PostCardProps) => {
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-              {post.profiles?.avatar_url ? (
+              {post.profile?.avatar_url ? (
                 <img
-                  src={post.profiles.avatar_url}
+                  src={post.profile.avatar_url}
                   alt="Avatar"
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (
                 <span className="text-sm font-medium">
-                  {post.profiles?.nickname?.[0] || "?"}
+                  {post.profile?.nickname?.[0] || "?"}
                 </span>
               )}
             </div>
             <div>
-              <p className="font-medium">{post.profiles?.nickname}</p>
+              <p className="font-medium">{post.profile?.nickname}</p>
               <p className="text-sm text-gray-500">
                 {formatDate(post.created_at)}
               </p>

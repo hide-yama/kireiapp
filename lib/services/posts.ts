@@ -22,8 +22,7 @@ export class PostService {
           place,
           group_id,
           user_id,
-          created_at,
-          updated_at
+          created_at
         `)
         .order('created_at', { ascending: false })
 
@@ -76,11 +75,35 @@ export class PostService {
           console.log(`Processing post ${post.id}`)
           
           // プロフィール情報を取得
-          const { data: profile } = await this.supabase
+          const { data: profile, error: profileError } = await this.supabase
             .from('profiles')
             .select('id, nickname, avatar_url')
             .eq('id', post.user_id)
-            .single()
+            .maybeSingle()
+          
+          if (profileError) {
+            console.error(`Profile fetch error for user ${post.user_id}:`, profileError)
+            
+            // If profile doesn't exist, try to create it as fallback
+            if (profileError.code === 'PGRST116') {
+              console.log(`Attempting to create missing profile for user ${post.user_id}`)
+              try {
+                const { data: newProfile } = await this.supabase
+                  .from('profiles')
+                  .insert({
+                    id: post.user_id,
+                    nickname: 'User'
+                  })
+                  .select('id, nickname, avatar_url')
+                  .single()
+                
+                console.log(`Created profile for user ${post.user_id}:`, newProfile)
+              } catch (createError) {
+                console.error(`Failed to create profile for user ${post.user_id}:`, createError)
+              }
+            }
+          }
+          console.log(`Profile for user ${post.user_id}:`, profile)
           
           // グループ情報を取得
           const { data: group } = await this.supabase
@@ -132,22 +155,7 @@ export class PostService {
           place,
           group_id,
           user_id,
-          created_at,
-          updated_at,
-          profiles (
-            id,
-            nickname,
-            avatar_url
-          ),
-          family_groups (
-            id,
-            name
-          ),
-          post_images (
-            id,
-            storage_path,
-            position
-          )
+          created_at
         `)
         .eq('id', postId)
         .single()
@@ -156,15 +164,51 @@ export class PostService {
         return { data: null, error }
       }
 
+      // 関連データを個別に取得
+      // プロフィール情報を取得
+      const { data: profile, error: profileError } = await this.supabase
+        .from('profiles')
+        .select('id, nickname, avatar_url')
+        .eq('id', data.user_id)
+        .maybeSingle()
+      
+      // If profile doesn't exist, try to create it as fallback
+      if (!profile && profileError?.code === 'PGRST116') {
+        try {
+          await this.supabase
+            .from('profiles')
+            .insert({
+              id: data.user_id,
+              nickname: 'User'
+            })
+        } catch (createError) {
+          console.error(`Failed to create profile for user ${data.user_id}:`, createError)
+        }
+      }
+      
+      // グループ情報を取得
+      const { data: group } = await this.supabase
+        .from('family_groups')
+        .select('id, name')
+        .eq('id', data.group_id)
+        .single()
+      
+      // 画像情報を取得
+      const { data: post_images } = await this.supabase
+        .from('post_images')
+        .select('id, storage_path, position')
+        .eq('post_id', data.id)
+        .order('position')
+
       // データを変換
       const postWithDetails = {
         ...data,
-        profile: data.profiles,
-        group: data.family_groups,
-        post_images: data.post_images?.map(image => ({
+        profile: profile || { id: data.user_id, nickname: 'Unknown User', avatar_url: null },
+        group: group || { id: data.group_id, name: 'Unknown Group' },
+        post_images: (post_images || []).map(image => ({
           ...image,
           url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/post-images/${image.storage_path}`
-        })) || [],
+        })),
         like_count: 0, // 別途取得
         comment_count: 0, // 別途取得
         is_liked: false // 別途取得

@@ -66,11 +66,14 @@ export function CommentList({ postId, currentUserId, refreshTrigger }: CommentLi
               
               return {
                 ...comment,
-                profiles: profileData || undefined
+                profiles: profileData || { nickname: 'Unknown User', avatar_url: null }
               }
             } catch (profileError) {
               console.log('Could not fetch profile for comment', comment.id)
-              return comment
+              return {
+                ...comment,
+                profiles: { nickname: 'Unknown User', avatar_url: null }
+              }
             }
           })
         )

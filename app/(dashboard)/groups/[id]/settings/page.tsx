@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { GroupImageUpload } from '@/components/groups/GroupImageUpload'
 import { createClient } from '@/lib/supabase/client'
 import { Trash2, RefreshCw } from 'lucide-react'
 
@@ -241,7 +242,7 @@ export default function GroupSettingsPage() {
           <CardHeader>
             <CardTitle>基本情報</CardTitle>
             <CardDescription>
-              グループの名前とアバター画像を編集できます
+              グループの名前とアイコン画像を編集できます
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -257,16 +258,10 @@ export default function GroupSettingsPage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="avatar_url">アバター画像URL</Label>
-                <Input
-                  id="avatar_url"
-                  type="url"
-                  value={formData.avatar_url}
-                  onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
+              <GroupImageUpload
+                currentImageUrl={formData.avatar_url}
+                onUploadComplete={(url) => setFormData({ ...formData, avatar_url: url })}
+              />
 
               <Button type="submit" disabled={saving || !formData.name.trim()}>
                 {saving ? '保存中...' : '変更を保存'}

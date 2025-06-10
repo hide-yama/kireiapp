@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { NotificationCard } from '@/components/notifications/NotificationCard'
+import { useNotification } from '@/contexts/NotificationContext'
 
 interface Notification {
   id: string
@@ -26,6 +27,7 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
+  const { refreshUnreadCount } = useNotification()
   const supabase = createClient()
 
   useEffect(() => {
@@ -43,6 +45,7 @@ export default function NotificationsPage() {
   const fetchNotifications = async (userId: string) => {
     setLoading(true)
     try {
+      // まずシンプルなクエリで通知データを取得
       const { data, error } = await supabase
         .from('notifications')
         .select(`
@@ -51,14 +54,7 @@ export default function NotificationsPage() {
           read,
           created_at,
           post_id,
-          from_user_id,
-          from_user:from_user_id (
-            nickname,
-            avatar_url
-          ),
-          post:post_id (
-            body
-          )
+          from_user_id
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
@@ -66,7 +62,44 @@ export default function NotificationsPage() {
 
       if (error) throw error
 
-      setNotifications(data || [])
+      // 通知データがあれば、関連データを個別に取得
+      if (data && data.length > 0) {
+        const notificationsWithDetails = await Promise.all(
+          data.map(async (notification) => {
+            let from_user = null
+            let post = null
+
+            // from_user情報を取得
+            if (notification.from_user_id) {
+              const { data: userData } = await supabase
+                .from('profiles')
+                .select('nickname, avatar_url')
+                .eq('id', notification.from_user_id)
+                .maybeSingle()
+              from_user = userData
+            }
+
+            // post情報を取得
+            if (notification.post_id) {
+              const { data: postData } = await supabase
+                .from('posts')
+                .select('body')
+                .eq('id', notification.post_id)
+                .single()
+              post = postData
+            }
+
+            return {
+              ...notification,
+              from_user,
+              post
+            }
+          })
+        )
+        setNotifications(notificationsWithDetails)
+      } else {
+        setNotifications([])
+      }
     } catch (error) {
       console.error('Error fetching notifications:', error)
     } finally {
@@ -112,6 +145,9 @@ export default function NotificationsPage() {
       setNotifications(prev =>
         prev.map(notification => ({ ...notification, read: true }))
       )
+      
+      // 通知数をリフレッシュ
+      refreshUnreadCount()
     } catch (error) {
       console.error('Error marking all notifications as read:', error)
     }

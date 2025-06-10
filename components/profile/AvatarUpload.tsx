@@ -83,9 +83,9 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
 
       onUploadComplete(publicUrl)
       setPreview(publicUrl)
-      alert('アバター画像を更新しました')
+      alert('プロフィールアイコンを更新しました')
       
-      // アバター更新後にページをリロードして最新状態を反映
+      // アイコン更新後にページをリロードして最新状態を反映
       setTimeout(() => {
         window.location.reload()
       }, 1000)
@@ -94,7 +94,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
       console.error('Error uploading avatar:', error)
       
       // エラーメッセージを詳細に表示
-      let errorMessage = 'アバターのアップロードに失敗しました'
+      let errorMessage = 'プロフィールアイコンのアップロードに失敗しました'
       
       if (error?.message) {
         errorMessage = error.message
@@ -130,17 +130,17 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
 
   return (
     <div className="space-y-4">
-      <Label>アバター画像</Label>
+      <Label>プロフィールアイコン</Label>
       <div className="flex items-center space-x-4">
         <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
           {preview ? (
             <img
               src={preview}
-              alt="Avatar preview"
+              alt="Profile icon preview"
               className="w-20 h-20 rounded-full object-cover"
             />
           ) : (
-            <span className="text-gray-500 text-sm">画像なし</span>
+            <span className="text-gray-500 text-sm">アイコンなし</span>
           )}
         </div>
         <div>
@@ -150,7 +150,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
             onClick={handleButtonClick}
             disabled={uploading}
           >
-            {uploading ? 'アップロード中...' : '画像を変更'}
+            {uploading ? 'アップロード中...' : 'アイコンを変更'}
           </Button>
           <p className="text-sm text-gray-500 mt-1">
             JPEG, PNG, WebP / 最大5MB

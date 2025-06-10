@@ -47,22 +47,13 @@ export default function SignUpPage() {
       return
     }
 
-    // 少し待機してからプロファイルを作成（認証データの同期を待つ）
-    await new Promise(resolve => setTimeout(resolve, 500))
-
-    const profileResult = await apiClient.createProfile({
-      id: authResult.data.user.id,
-      nickname: data.nickname,
+    // サインアップ成功後はログイン画面に誘導
+    toast({
+      title: "アカウントが作成されました",
+      description: "確認メールをお送りしました。ログインしてください。",
+      variant: "success",
     })
-
-    if (profileResult.success) {
-      toast({
-        title: "アカウントが作成されました",
-        description: "ダッシュボードに移動します",
-        variant: "success",
-      })
-      router.push('/dashboard')
-    }
+    router.push('/signin')
   }
 
   return (

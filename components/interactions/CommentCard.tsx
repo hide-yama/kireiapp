@@ -12,7 +12,7 @@ interface CommentCardProps {
     body: string
     created_at: string
     user_id: string
-    profiles: {
+    profiles?: {
       nickname: string
       avatar_url?: string
     }
@@ -71,14 +71,14 @@ export function CommentCard({ comment, currentUserId, onDeleted }: CommentCardPr
   return (
     <div className="flex space-x-3">
       <ProfileAvatar
-        avatarUrl={comment.profiles.avatar_url}
-        nickname={comment.profiles.nickname}
+        avatarUrl={comment.profiles?.avatar_url}
+        nickname={comment.profiles?.nickname || 'Unknown User'}
         size="sm"
       />
       <div className="flex-1 min-w-0">
         <div className="flex items-center space-x-2">
           <span className="text-sm font-medium text-gray-900">
-            {comment.profiles.nickname}
+            {comment.profiles?.nickname || 'Unknown User'}
           </span>
           <span className="text-xs text-gray-500">
             {formatDate(comment.created_at)}

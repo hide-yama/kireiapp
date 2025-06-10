@@ -101,7 +101,7 @@ class APIClient {
 
   // Auth methods
   async signUp(email: string, password: string, metadata?: Record<string, unknown>): Promise<APIResponse<AuthResponse>> {
-    return this.executeQuery<AuthResponse>(
+    const result = await this.executeQuery<AuthResponse>(
       () => this.supabase.auth.signUp({
         email,
         password,
@@ -109,6 +109,33 @@ class APIClient {
       }),
       { fallbackMessage: 'アカウント作成に失敗しました' }
     )
+
+    // If signup was successful but we have a user, ensure profile exists as fallback
+    if (result.success && result.data?.user && result.data.user.id) {
+      try {
+        // Check if profile exists
+        const { data: existingProfile } = await this.supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', result.data.user.id)
+          .maybeSingle()
+
+        // If no profile exists, create one as fallback
+        if (!existingProfile) {
+          await this.supabase
+            .from('profiles')
+            .insert({
+              id: result.data.user.id,
+              nickname: metadata?.nickname as string || 'User'
+            })
+        }
+      } catch (error) {
+        // Profile creation failed, but don't fail the signup
+        console.warn('Fallback profile creation failed:', error)
+      }
+    }
+
+    return result
   }
 
   async signIn(email: string, password: string): Promise<APIResponse<AuthResponse>> {
@@ -156,7 +183,7 @@ class APIClient {
     )
   }
 
-  async createProfile(profile: Omit<Profile, 'created_at' | 'updated_at'>): Promise<APIResponse<Profile>> {
+  async createProfile(profile: Omit<Profile, 'created_at'>): Promise<APIResponse<Profile>> {
     return this.executeQuery<Profile>(
       () => this.supabase
         .from('profiles')

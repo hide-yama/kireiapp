@@ -30,7 +30,8 @@
       "Bash(git add:*)",
       "Bash(gh repo view:*)",
       "Bash(git remote add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
