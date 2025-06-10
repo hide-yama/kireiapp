@@ -1,81 +1,67 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  
-  --color-background: oklch(100% 0 0);
-  --color-foreground: oklch(9% 0 0);
-  
-  --color-card: oklch(100% 0 0);
-  --color-card-foreground: oklch(9% 0 0);
-  
-  --color-popover: oklch(100% 0 0);
-  --color-popover-foreground: oklch(9% 0 0);
-  
-  --color-primary: oklch(16% 0 0);
-  --color-primary-foreground: oklch(98% 0 0);
-  
-  --color-secondary: oklch(96% 0 0);
-  --color-secondary-foreground: oklch(9% 0 0);
-  
-  --color-muted: oklch(96% 0 0);
-  --color-muted-foreground: oklch(40% 0 0);
-  
-  --color-accent: oklch(96% 0 0);
-  --color-accent-foreground: oklch(9% 0 0);
-  
-  --color-destructive: oklch(54% 0.2 27);
-  --color-destructive-foreground: oklch(98% 0 0);
-  
-  --color-border: oklch(90% 0 0);
-  --color-input: oklch(90% 0 0);
-  --color-ring: oklch(64% 0 0);
-
-  --radius: 0.5rem;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --color-background: oklch(9% 0 0);
-    --color-foreground: oklch(98% 0 0);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
     
-    --color-card: oklch(9% 0 0);
-    --color-card-foreground: oklch(98% 0 0);
-    
-    --color-popover: oklch(9% 0 0);
-    --color-popover-foreground: oklch(98% 0 0);
-    
-    --color-primary: oklch(98% 0 0);
-    --color-primary-foreground: oklch(9% 0 0);
-    
-    --color-secondary: oklch(14% 0 0);
-    --color-secondary-foreground: oklch(98% 0 0);
-    
-    --color-muted: oklch(14% 0 0);
-    --color-muted-foreground: oklch(71% 0 0);
-    
-    --color-accent: oklch(14% 0 0);
-    --color-accent-foreground: oklch(98% 0 0);
-    
-    --color-destructive: oklch(63% 0.2 27);
-    --color-destructive-foreground: oklch(98% 0 0);
-    
-    --color-border: oklch(14% 0 0);
-    --color-input: oklch(14% 0 0);
-    --color-ring: oklch(83% 0 0);
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
   }
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  background: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-sans);
-  min-height: 100vh;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    min-height: 100vh;
+  }
 }
 
 /* Mobile optimizations */
