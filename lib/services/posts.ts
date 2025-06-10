@@ -23,21 +23,7 @@ export class PostService {
           group_id,
           user_id,
           created_at,
-          updated_at,
-          profiles (
-            id,
-            nickname,
-            avatar_url
-          ),
-          family_groups (
-            id,
-            name
-          ),
-          post_images (
-            id,
-            storage_path,
-            position
-          )
+          updated_at
         `)
         .order('created_at', { ascending: false })
 
@@ -79,21 +65,53 @@ export class PostService {
         return { data: null, error }
       }
 
-      // データを変換してURLを追加
-      const postsWithUrls = (data || []).map(post => ({
-        ...post,
-        profile: post.profiles,
-        group: post.family_groups,
-        post_images: post.post_images?.map(image => ({
-          ...image,
-          url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/post-images/${image.storage_path}`
-        })) || [],
-        like_count: 0, // 別途取得する
-        comment_count: 0 // 別途取得する
-      })) as PostWithDetails[]
+      // 関連データを個別に取得
+      if (!data || data.length === 0) {
+        console.log('No posts found')
+        return { data: [], error: null }
+      }
 
-      console.log('Posts processed successfully:', postsWithUrls.length)
-      return { data: postsWithUrls, error: null }
+      const postsWithDetails = await Promise.all(
+        data.map(async (post) => {
+          console.log(`Processing post ${post.id}`)
+          
+          // プロフィール情報を取得
+          const { data: profile } = await this.supabase
+            .from('profiles')
+            .select('id, nickname, avatar_url')
+            .eq('id', post.user_id)
+            .single()
+          
+          // グループ情報を取得
+          const { data: group } = await this.supabase
+            .from('family_groups')
+            .select('id, name')
+            .eq('id', post.group_id)
+            .single()
+          
+          // 画像情報を取得
+          const { data: post_images } = await this.supabase
+            .from('post_images')
+            .select('id, storage_path, position')
+            .eq('post_id', post.id)
+            .order('position')
+
+          return {
+            ...post,
+            profile: profile || { id: post.user_id, nickname: 'Unknown User', avatar_url: null },
+            group: group || { id: post.group_id, name: 'Unknown Group' },
+            post_images: (post_images || []).map(image => ({
+              ...image,
+              url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/post-images/${image.storage_path}`
+            })),
+            like_count: 0,
+            comment_count: 0
+          } as PostWithDetails
+        })
+      )
+
+      console.log('Posts processed successfully:', postsWithDetails.length)
+      return { data: postsWithDetails, error: null }
     } catch (error) {
       console.error('PostService.getPosts catch error:', error)
       return { data: null, error }
