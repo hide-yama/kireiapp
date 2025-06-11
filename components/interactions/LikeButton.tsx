@@ -111,7 +111,7 @@ export function LikeButton({ postId, initialLikeCount = 0, initialIsLiked = fals
       size="sm"
       onClick={handleLike}
       disabled={isLoading || !userId}
-      className={`flex items-center space-x-2 ${isLiked ? 'text-red-600' : 'text-gray-600'}`}
+      className={`flex items-center space-x-2 ${isLiked ? 'text-red-600' : 'text-gray-300'}`}
     >
       <Heart 
         className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`}

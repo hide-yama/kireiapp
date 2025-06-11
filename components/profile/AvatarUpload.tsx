@@ -130,7 +130,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
 
   return (
     <div className="space-y-4">
-      <Label>プロフィールアイコン</Label>
+      <Label className="text-white">プロフィールアイコン</Label>
       <div className="flex items-center space-x-4">
         <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
           {preview ? (
@@ -140,7 +140,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
               className="w-20 h-20 rounded-full object-cover"
             />
           ) : (
-            <span className="text-gray-500 text-sm">アイコンなし</span>
+            <span className="text-gray-300 text-sm">アイコンなし</span>
           )}
         </div>
         <div>
@@ -149,10 +149,11 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
             variant="outline"
             onClick={handleButtonClick}
             disabled={uploading}
+            className="text-white border-white hover:bg-white hover:text-black"
           >
             {uploading ? 'アップロード中...' : 'アイコンを変更'}
           </Button>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-white mt-1">
             JPEG, PNG, WebP / 最大5MB
           </p>
         </div>

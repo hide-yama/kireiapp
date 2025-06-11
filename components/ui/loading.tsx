@@ -21,7 +21,7 @@ export function Loading({ size = "md", className, text }: LoadingProps) {
           sizeClasses[size]
         )}
       />
-      {text && <span className="text-sm text-muted-foreground">{text}</span>}
+      {text && <span className="text-sm text-gray-300">{text}</span>}
     </div>
   )
 }

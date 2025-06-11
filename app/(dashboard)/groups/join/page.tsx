@@ -77,6 +77,7 @@ export default function JoinGroupPage() {
                 type="button" 
                 variant="outline" 
                 onClick={() => router.back()}
+                className="text-white border-white hover:bg-white hover:text-black"
               >
                 キャンセル
               </Button>

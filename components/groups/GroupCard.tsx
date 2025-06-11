@@ -25,7 +25,7 @@ export function GroupCard({ group }: GroupCardProps) {
             />
           ) : (
             <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-              <Users className="w-6 h-6 text-gray-500" />
+              <Users className="w-6 h-6 text-gray-300" />
             </div>
           )}
           <div>

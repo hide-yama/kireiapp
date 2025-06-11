@@ -142,6 +142,7 @@ export default function ProfilePage() {
                 variant="outline" 
                 onClick={() => router.push('/dashboard')}
                 disabled={loading}
+                className="text-white border-white hover:bg-white hover:text-black"
               >
                 キャンセル
               </Button>
@@ -150,13 +151,13 @@ export default function ProfilePage() {
             <div className="pt-6 border-t">
               <Button 
                 type="button" 
-                variant="destructive" 
+                variant="outline" 
                 onClick={async () => {
                   await supabase.auth.signOut()
                   router.push('/signin')
                 }}
                 disabled={loading}
-                className="w-full"
+                className="w-full bg-white text-red-600 border-red-600 hover:bg-red-50"
               >
                 ログアウト
               </Button>

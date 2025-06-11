@@ -51,11 +51,11 @@ export function NotificationCard({ notification, onMarkAsRead }: NotificationCar
   const getNotificationIcon = () => {
     switch (notification.type) {
       case 'like':
-        return <Heart className="h-4 w-4 text-red-500" />
+        return <Heart className="h-6 w-6 text-red-500" />
       case 'comment':
-        return <MessageCircle className="h-4 w-4 text-blue-500" />
+        return <MessageCircle className="h-6 w-6 text-blue-500" />
       case 'post':
-        return <FileText className="h-4 w-4 text-green-500" />
+        return <FileText className="h-6 w-6 text-green-500" />
       default:
         return null
     }
@@ -120,7 +120,7 @@ export function NotificationCard({ notification, onMarkAsRead }: NotificationCar
                   「{notification.post.body.substring(0, 50)}...」
                 </p>
               )}
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-300 mt-1">
                 {formatDate(notification.created_at)}
               </p>
             </div>

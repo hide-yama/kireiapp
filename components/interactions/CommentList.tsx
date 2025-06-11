@@ -119,7 +119,7 @@ export function CommentList({ postId, currentUserId, refreshTrigger }: CommentLi
 
   if (comments.length === 0) {
     return (
-      <div className="text-sm text-gray-500 text-center py-4">
+      <div className="text-sm text-white text-center py-4">
         まだコメントがありません
       </div>
     )

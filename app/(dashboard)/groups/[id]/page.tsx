@@ -162,7 +162,7 @@ export default function GroupDetailPage() {
           )}
           <div>
             <h1 className="text-2xl font-bold">{group.name}</h1>
-            <p className="text-gray-300">{members.length}人のメンバー</p>
+            <p className="text-white">{members.length}人のメンバー</p>
           </div>
         </div>
         
@@ -186,7 +186,7 @@ export default function GroupDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <code className="bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded text-lg font-mono flex-1 text-center text-gray-900 dark:text-gray-100">
+              <code className="bg-gray-800 px-3 py-2 rounded text-lg font-mono flex-1 text-center text-white">
                 {group.invitation_code}
               </code>
               <Button
@@ -228,7 +228,7 @@ export default function GroupDetailPage() {
                   )}
                   <div className="flex-1">
                     <p className="font-medium text-white">{member.profiles.nickname}</p>
-                    <p className="text-sm text-gray-300">
+                    <p className="text-sm text-white">
                       {member.role === 'owner' ? 'オーナー' : 'メンバー'}
                     </p>
                   </div>

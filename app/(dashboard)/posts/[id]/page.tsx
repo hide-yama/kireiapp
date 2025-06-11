@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client"
 import { LikeButton } from "@/components/interactions/LikeButton"
 import { CommentForm } from "@/components/interactions/CommentForm"
 import { CommentList } from "@/components/interactions/CommentList"
+import { MapPin } from "lucide-react"
 
 interface Post {
   id: string
@@ -165,7 +166,7 @@ export default function PostDetailPage() {
       <div className="container mx-auto py-6">
         <p>投稿が見つかりません</p>
         <Link href="/posts">
-          <Button variant="outline">一覧に戻る</Button>
+          <Button variant="outline" className="text-white border-white hover:bg-white hover:text-black">一覧に戻る</Button>
         </Link>
       </div>
     )
@@ -178,7 +179,7 @@ export default function PostDetailPage() {
     <div className="container mx-auto py-6">
       <div className="mb-4">
         <Link href="/posts">
-          <Button variant="outline">← 一覧に戻る</Button>
+          <Button variant="outline" className="text-white border-white hover:bg-white hover:text-black">← 一覧に戻る</Button>
         </Link>
       </div>
 
@@ -201,7 +202,7 @@ export default function PostDetailPage() {
               </div>
               <div>
                 <p className="font-medium text-lg">{post.profiles?.nickname}</p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-300">
                   {formatDate(post.created_at)}
                 </p>
               </div>
@@ -209,7 +210,7 @@ export default function PostDetailPage() {
             {isOwner && (
               <div className="flex gap-2">
                 <Link href={`/posts/${post.id}/edit`}>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-black">
                     編集
                   </Button>
                 </Link>
@@ -222,8 +223,9 @@ export default function PostDetailPage() {
               {post.category}
             </span>
             {post.place && (
-              <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
-                📍 {post.place}
+              <span className="px-3 py-1 bg-gray-800 text-white rounded-full text-sm flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {post.place}
               </span>
             )}
           </div>
@@ -277,7 +279,7 @@ export default function PostDetailPage() {
               </div>
               
               {sortedImages.length > 1 && (
-                <p className="text-center text-sm text-gray-500 mt-2">
+                <p className="text-center text-sm text-gray-300 mt-2">
                   {currentImageIndex + 1} / {sortedImages.length}
                 </p>
               )}
@@ -295,7 +297,7 @@ export default function PostDetailPage() {
 
             {/* コメント部分 */}
             <div className="space-y-4">
-              <h3 className="font-medium text-gray-900">コメント</h3>
+              <h3 className="font-medium text-white">コメント</h3>
               
               <CommentForm
                 postId={post.id}

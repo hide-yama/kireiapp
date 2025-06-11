@@ -203,7 +203,7 @@ export default function DashboardPage() {
           </Card>
 
 
-          <Card className="bg-muted text-muted-foreground">
+          <Card className="bg-gray-800 text-gray-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>

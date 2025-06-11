@@ -66,7 +66,7 @@ export function CommentForm({ postId, userId, onCommentAdded }: CommentFormProps
 
   if (!userId) {
     return (
-      <div className="text-sm text-gray-500 text-center py-4">
+      <div className="text-sm text-gray-300 text-center py-4">
         ログインしてコメントを投稿
       </div>
     )
