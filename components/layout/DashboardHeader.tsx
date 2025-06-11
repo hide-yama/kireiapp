@@ -36,19 +36,19 @@ export function DashboardHeader({ userId }: DashboardHeaderProps) {
           <nav className="hidden md:flex items-center space-x-1">
             <Link href="/feed">
               <Button variant="ghost" size="sm" className="gap-2">
-                <Home className="h-4 w-4" />
+                <Home className="h-5 w-5" />
                 フィード
               </Button>
             </Link>
             <Link href="/groups">
               <Button variant="ghost" size="sm" className="gap-2">
-                <Users className="h-4 w-4" />
+                <Users className="h-5 w-5" />
                 グループ
               </Button>
             </Link>
             <Link href="/profile">
               <Button variant="ghost" size="sm" className="gap-2">
-                <User className="h-4 w-4" />
+                <User className="h-5 w-5" />
                 プロフィール
               </Button>
             </Link>

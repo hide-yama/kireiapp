@@ -56,12 +56,12 @@ export function MobileNavigation({ userId }: MobileNavigationProps) {
       <div className="flex items-center justify-around h-12 px-4">
         <Link href="/feed">
           <Button variant="ghost" size="sm" className="p-3">
-            <Home className="h-5 w-5" />
+            <Home className="h-6 w-6" />
           </Button>
         </Link>
         <Link href="/groups">
           <Button variant="ghost" size="sm" className="p-3">
-            <Users className="h-5 w-5" />
+            <Users className="h-6 w-6" />
           </Button>
         </Link>
         <Link href="/profile">
