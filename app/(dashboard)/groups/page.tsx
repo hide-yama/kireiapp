@@ -46,12 +46,32 @@ export default function GroupsPage() {
 
       console.log('Step 2: User found:', user.id)
 
-      // RLSが無効化されているのでdirect queryを試す
-      console.log('Step 3: Direct group query...')
+      // まず、ユーザーが参加しているグループIDを取得
+      console.log('Step 3: Getting user groups from family_members...')
+      const { data: memberData, error: memberError } = await supabase
+        .from('family_members')
+        .select('group_id')
+        .eq('user_id', user.id)
+
+      if (memberError) {
+        console.error('Member query error:', memberError)
+        return
+      }
+
+      if (!memberData || memberData.length === 0) {
+        console.log('User is not a member of any groups')
+        setGroups([])
+        return
+      }
+
+      const groupIds = memberData.map(m => m.group_id)
+      console.log('User is member of groups:', groupIds)
+
+      // 参加しているグループの詳細を取得
       const { data: groupsData, error: groupsError } = await supabase
         .from('family_groups')
         .select('*')
-        .eq('owner_id', user.id)
+        .in('id', groupIds)
 
       console.log('Groups query result:', { groupsData, groupsError })
 
