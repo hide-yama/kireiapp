@@ -87,8 +87,8 @@ export function NotificationCard({ notification, onMarkAsRead }: NotificationCar
 
   return (
     <Card 
-      className={`transition-colors hover:bg-gray-50 cursor-pointer ${
-        !isRead ? 'border-l-4 border-l-blue-500 bg-blue-50 shadow-sm' : 'border-gray-200'
+      className={`transition-colors hover:bg-gray-700 cursor-pointer ${
+        !isRead ? 'border-l-4 border-l-blue-500 bg-gray-700 shadow-sm' : ''
       }`}
     >
       <CardContent className="p-4">
@@ -108,7 +108,7 @@ export function NotificationCard({ notification, onMarkAsRead }: NotificationCar
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2">
                 {getNotificationIcon()}
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-white">
                   {getNotificationText()}
                 </p>
                 {!isRead && (
@@ -116,7 +116,7 @@ export function NotificationCard({ notification, onMarkAsRead }: NotificationCar
                 )}
               </div>
               {notification.post?.body && (
-                <p className="text-sm text-gray-600 mt-1 truncate">
+                <p className="text-sm text-gray-400 mt-1 truncate">
                   「{notification.post.body.substring(0, 50)}...」
                 </p>
               )}
