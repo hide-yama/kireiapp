@@ -109,13 +109,67 @@ kireiapp/
 
 このプロジェクトでは [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) を使用して [Geist](https://vercel.com/font) フォントを自動最適化・読み込みしています。
 
+## 開発・運用フロー
+
+### ブランチ戦略
+
+本プロジェクトでは以下のブランチ戦略を採用しています：
+
+- **`main`ブランチ**: 本番環境（自動デプロイ）
+- **`develop`ブランチ**: 開発環境（プレビューデプロイ）
+
+### 開発の流れ
+
+1. **開発作業は`develop`ブランチで行う**
+   ```bash
+   git checkout develop
+   git pull origin develop
+   ```
+
+2. **機能開発・修正を実施**
+   ```bash
+   # コードを編集
+   git add .
+   git commit -m "機能: 〇〇を追加"
+   git push origin develop
+   ```
+
+3. **プレビュー環境で確認**
+   - Vercelが自動的にプレビューURLを生成
+   - 例: `kireiapp-git-develop-[username].vercel.app`
+
+4. **本番環境へのデプロイ**
+   ```bash
+   # developブランチの内容をmainにマージ
+   git checkout main
+   git pull origin main
+   git merge develop
+   git push origin main
+   ```
+   - mainブランチへのプッシュで本番環境に自動デプロイ
+
+### 注意事項
+
+- **直接`main`ブランチにプッシュしない**
+- 重要な変更は必ずプレビュー環境で確認
+- 本番デプロイ前にはPull Requestの作成を推奨
+
 ## デプロイ
 
 ### Vercelでのデプロイ（推奨）
 
+#### 初回セットアップ
+
 1. [Vercel Platform](https://vercel.com/new) でプロジェクトをインポート
-2. 環境変数を設定
-3. デプロイ実行
+2. 環境変数を設定：
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. Production Branch: `main`に設定
+
+#### 環境
+
+- **本番環境**: `https://kireiapp.vercel.app` (mainブランチ)
+- **プレビュー環境**: Vercelが自動生成するURL (developブランチ)
 
 詳細は [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) を参照してください。
 
