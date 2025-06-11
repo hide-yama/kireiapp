@@ -35,19 +35,19 @@ export function DashboardHeader({ userId }: DashboardHeaderProps) {
           
           <nav className="hidden md:flex items-center space-x-1">
             <Link href="/feed">
-              <Button variant="ghost" size="sm" className="gap-2 text-white hover:text-white hover:bg-white/10">
+              <Button variant="ghost" size="sm" className="gap-2 text-white hover:text-white hover:bg-white/10 [&_svg]:size-5">
                 <Home className="h-5 w-5" />
                 フィード
               </Button>
             </Link>
             <Link href="/groups">
-              <Button variant="ghost" size="sm" className="gap-2 text-white hover:text-white hover:bg-white/10">
+              <Button variant="ghost" size="sm" className="gap-2 text-white hover:text-white hover:bg-white/10 [&_svg]:size-5">
                 <Users className="h-5 w-5" />
                 グループ
               </Button>
             </Link>
             <Link href="/profile">
-              <Button variant="ghost" size="sm" className="gap-2 text-white hover:text-white hover:bg-white/10">
+              <Button variant="ghost" size="sm" className="gap-2 text-white hover:text-white hover:bg-white/10 [&_svg]:size-5">
                 <User className="h-5 w-5" />
                 プロフィール
               </Button>
