@@ -212,7 +212,7 @@ export default function EditPostPage() {
                 id="body"
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                className="w-full min-h-[120px] p-3 border rounded-md resize-vertical"
+                className="w-full min-h-[120px] p-3 border rounded-md resize-vertical text-black"
                 placeholder="今日の家事について書いてください..."
                 required
               />
@@ -224,7 +224,7 @@ export default function EditPostPage() {
                 id="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full p-3 border rounded-md"
+                className="w-full p-3 border rounded-md text-black"
                 required
               >
                 <option value="">カテゴリを選択</option>
@@ -304,17 +304,18 @@ export default function EditPostPage() {
               )}
             </div>
 
-            <div className="flex gap-3 justify-between">
+            <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
               <Button
                 type="button"
                 variant="destructive"
                 onClick={handleDelete}
                 disabled={isDeleting}
+                className="whitespace-normal min-w-0 sm:whitespace-nowrap"
               >
                 {isDeleting ? "削除中..." : "投稿を削除"}
               </Button>
               
-              <div className="flex gap-3">
+              <div className="flex gap-3 justify-center sm:justify-end">
                 <Button
                   type="button"
                   variant="outline"

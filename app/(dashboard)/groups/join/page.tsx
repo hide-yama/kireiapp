@@ -28,7 +28,7 @@ export default function JoinGroupPage() {
 
       if (response.ok) {
         const { group } = await response.json()
-        router.push(`/dashboard/groups/${group.id}`)
+        router.push(`/groups/${group.id}`)
       } else {
         const error = await response.json()
         alert(error.error || 'グループへの参加に失敗しました')

@@ -1,15 +1,18 @@
 'use client'
 
-import React, { memo, useState } from "react"
+import React, { memo, useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LikeButton } from "@/components/interactions/LikeButton"
 import { CommentForm } from "@/components/interactions/CommentForm"
 import { CommentList } from "@/components/interactions/CommentList"
-import { MessageCircle, MoreHorizontal, MapPin, X } from "lucide-react"
+import { MessageCircle, MoreHorizontal, MapPin, X, Edit2, Trash2 } from "lucide-react"
+import { ImageSlider } from "@/components/ui/image-slider"
 import { PostWithDetails } from "@/types/domain"
 import { formatDate, isValidImageUrl } from "@/lib/utils"
+import { createClient } from "@/lib/supabase/client"
 
 interface PostCardProps {
   post: PostWithDetails
@@ -17,11 +20,15 @@ interface PostCardProps {
 }
 
 const PostCardComponent = ({ post, currentUserId }: PostCardProps) => {
-  // 最初の画像を取得（既にソート済みの場合）
-  const firstImage = post.post_images?.[0]
+  const router = useRouter()
+  const supabase = createClient()
+  const menuRef = useRef<HTMLDivElement>(null)
   
-  // 画像URLの安全性チェック
-  const safeImageUrl = firstImage?.url && isValidImageUrl(firstImage.url) ? firstImage.url : null
+  // 画像データを準備
+  const validImages = post.post_images?.filter(img => img.url && isValidImageUrl(img.url)).map(img => ({
+    url: img.url,
+    alt: `投稿画像`
+  })) || []
   
   // 本文が長いかチェック
   const textLength = post.body.length
@@ -33,18 +40,69 @@ const PostCardComponent = ({ post, currentUserId }: PostCardProps) => {
   // コメントモーダルの表示状態
   const [showCommentModal, setShowCommentModal] = useState(false)
   
+  // ドロップダウンメニューの表示状態
+  const [showMenu, setShowMenu] = useState(false)
+  
+  // 削除中の状態
+  const [isDeleting, setIsDeleting] = useState(false)
+  
   // コメント更新トリガー
   const [commentRefreshTrigger, setCommentRefreshTrigger] = useState(0)
   
   // ローカルコメント数の管理
   const [localCommentCount, setLocalCommentCount] = useState(post.comment_count || 0)
+  
+  // メニューの外側をクリックしたときに閉じる
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false)
+      }
+    }
+    
+    if (showMenu) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [showMenu])
+  
+  // 投稿の削除処理
+  const handleDelete = async () => {
+    if (!confirm("この投稿を削除しますか？")) {
+      return
+    }
+    
+    setIsDeleting(true)
+    try {
+      const { error } = await supabase
+        .from("posts")
+        .delete()
+        .eq("id", post.id)
+      
+      if (error) {
+        throw error
+      }
+      
+      // ページをリロード
+      window.location.reload()
+    } catch (error) {
+      console.error("Error deleting post:", error)
+      alert("投稿の削除に失敗しました")
+    } finally {
+      setIsDeleting(false)
+      setShowMenu(false)
+    }
+  }
 
   return (
     <div className="border-b border-gray-800 pb-4 mb-4">
       <div className="mb-3">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
-            <Link href={`/profile`}>
+            <Link href={`/profile/${post.user_id}`}>
               <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
                 {post.profile?.avatar_url ? (
                   <img
@@ -68,9 +126,42 @@ const PostCardComponent = ({ post, currentUserId }: PostCardProps) => {
               </p>
             </div>
           </div>
-          <button className="p-2 text-gray-400 hover:text-white">
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
+          <div className="relative" ref={menuRef}>
+            <button 
+              className="p-2 text-gray-400 hover:text-white"
+              onClick={() => setShowMenu(!showMenu)}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+            
+            {/* ドロップダウンメニュー */}
+            {showMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-10">
+                {currentUserId === post.user_id && (
+                  <>
+                    <button
+                      className="w-full px-4 py-2 text-left text-white hover:bg-gray-700 flex items-center gap-2 rounded-t-lg"
+                      onClick={() => {
+                        router.push(`/posts/${post.id}/edit`)
+                        setShowMenu(false)
+                      }}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                      編集
+                    </button>
+                    <button
+                      className="w-full px-4 py-2 text-left text-red-400 hover:bg-gray-700 flex items-center gap-2 rounded-b-lg"
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      {isDeleting ? "削除中..." : "削除"}
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
@@ -96,26 +187,10 @@ const PostCardComponent = ({ post, currentUserId }: PostCardProps) => {
           )}
         </div>
         
-        {safeImageUrl && (
-          <div className="relative group cursor-pointer">
-            <div className="aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
-              <img
-                src={safeImageUrl}
-                alt="投稿画像"
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                loading="lazy"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none'
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
-            {post.post_images && post.post_images.length > 1 && (
-              <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs rounded-lg backdrop-blur-sm">
-                +{post.post_images.length - 1}
-              </div>
-            )}
-          </div>
+        {validImages.length > 0 && (
+          <ImageSlider 
+            images={validImages}
+          />
         )}
 
         <div className="flex items-center justify-between pt-3">
