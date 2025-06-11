@@ -58,7 +58,7 @@ export default function SignInPage() {
   }
 
   return (
-    <Card>
+    <Card className="bg-white text-black border-gray-200">
       <CardHeader>
         <CardTitle>ログイン</CardTitle>
         <CardDescription>
@@ -95,6 +95,7 @@ export default function SignInPage() {
         <CardFooter className="flex flex-col space-y-4">
           <Button
             type="submit"
+            variant="secondary"
             className="w-full"
             disabled={isSubmitting}
           >

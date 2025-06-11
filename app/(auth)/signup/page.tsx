@@ -57,7 +57,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <Card>
+    <Card className="bg-white text-black border-gray-200">
       <CardHeader>
         <CardTitle>アカウント作成</CardTitle>
         <CardDescription>
@@ -118,6 +118,7 @@ export default function SignUpPage() {
         <CardFooter className="flex flex-col space-y-4">
           <Button
             type="submit"
+            variant="secondary"
             className="w-full"
             disabled={isSubmitting || rateLimitTime !== null}
           >

@@ -22,7 +22,7 @@ export default function Home() {
             <Button className="w-full" size="lg" asChild>
               <Link href="/signup">新規登録</Link>
             </Button>
-            <Button variant="outline" className="w-full" size="lg" asChild>
+            <Button variant="outline" className="w-full text-black hover:text-white border-gray-700 hover:border-gray-700" size="lg" asChild>
               <Link href="/signin">ログイン</Link>
             </Button>
           </div>
