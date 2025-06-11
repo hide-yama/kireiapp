@@ -31,7 +31,9 @@
       "Bash(gh repo view:*)",
       "Bash(git remote add:*)",
       "Bash(git push:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(echo $HOME)",
+      "Bash(npm run test:e2e:*)"
     ],
     "deny": []
   }

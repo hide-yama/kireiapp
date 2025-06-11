@@ -15,13 +15,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "キレイアプリ",
+  title: "キレイにできるもん",
   description: "家族の家事を共有するアプリ",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "キレイアプリ",
+    title: "キレイにできるもん",
   },
 };
 
