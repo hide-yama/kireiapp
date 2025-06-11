@@ -34,7 +34,7 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#8b5cf6",
+  themeColor: "#0f172a", // ダークグレー（ヘッダーと同じ色）
 };
 
 export default function RootLayout({
