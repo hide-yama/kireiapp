@@ -43,9 +43,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className={`${inter.variable} ${notoSansJP.variable} dark`}>
-      <body className="antialiased min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
-        <ThemeProvider defaultTheme="dark">
+    <html lang="ja" className={`${inter.variable} ${notoSansJP.variable}`}>
+      <body className="antialiased min-h-screen">
+        <ThemeProvider defaultTheme="system">
           <ErrorBoundary>
             <div className="relative min-h-screen">
               <div className="fixed inset-0 bg-gradient-to-br from-purple-900/10 via-transparent to-blue-900/10 pointer-events-none" />
