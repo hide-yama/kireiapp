@@ -1,153 +1,116 @@
-"use client"
+'use client'
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { X } from 'lucide-react'
-
-interface Group {
-  id: string
-  name: string
-}
+import { SlidersHorizontal } from 'lucide-react'
 
 interface FeedFilterProps {
-  groups: Group[]
-  selectedGroups: string[]
-  selectedCategories: string[]
-  onGroupsChange: (groupIds: string[]) => void
-  onCategoriesChange: (categories: string[]) => void
-  onClear: () => void
+  groups: Array<{ id: string; name: string }>
 }
 
-const CATEGORIES = ['料理', '掃除', '洗濯', '買い物', 'その他']
-
-export function FeedFilter({
-  groups,
-  selectedGroups,
-  selectedCategories,
-  onGroupsChange,
-  onCategoriesChange,
-  onClear
-}: FeedFilterProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
+export function FeedFilter({ groups }: FeedFilterProps) {
+  const [selectedGroups, setSelectedGroups] = useState<string[]>([])
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  
+  const categories = ['料理', '掃除', '洗濯', '買い物', 'その他']
+  
+  const activeFilters = selectedGroups.length + selectedCategories.length
 
   const toggleGroup = (groupId: string) => {
-    if (selectedGroups.includes(groupId)) {
-      onGroupsChange(selectedGroups.filter(id => id !== groupId))
-    } else {
-      onGroupsChange([...selectedGroups, groupId])
-    }
+    setSelectedGroups(prev =>
+      prev.includes(groupId)
+        ? prev.filter(id => id !== groupId)
+        : [...prev, groupId]
+    )
   }
 
   const toggleCategory = (category: string) => {
-    if (selectedCategories.includes(category)) {
-      onCategoriesChange(selectedCategories.filter(c => c !== category))
-    } else {
-      onCategoriesChange([...selectedCategories, category])
-    }
+    setSelectedCategories(prev =>
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    )
   }
 
-  const hasActiveFilters = selectedGroups.length > 0 || selectedCategories.length > 0
+  const clearFilters = () => {
+    setSelectedGroups([])
+    setSelectedCategories([])
+  }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-lg">フィルター</CardTitle>
-        <div className="flex items-center gap-2">
-          {hasActiveFilters && (
-            <Badge variant="secondary">
-              {selectedGroups.length + selectedCategories.length}件
-            </Badge>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm" className="relative">
+          <SlidersHorizontal className="h-4 w-4" />
+          {activeFilters > 0 && (
+            <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-xs text-primary-foreground flex items-center justify-center">
+              {activeFilters}
+            </span>
           )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? '閉じる' : '開く'}
-          </Button>
-        </div>
-      </CardHeader>
-
-      {/* Active Filters Summary */}
-      {hasActiveFilters && (
-        <CardContent className="pt-0 pb-2">
-          <div className="flex flex-wrap gap-2">
-            {selectedGroups.map(groupId => {
-              const group = groups.find(g => g.id === groupId)
-              return group ? (
-                <Badge key={groupId} variant="outline" className="flex items-center gap-1">
-                  {group.name}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-3 w-3 p-0"
-                    onClick={() => toggleGroup(groupId)}
-                  >
-                    <X className="h-2 w-2" />
-                  </Button>
-                </Badge>
-              ) : null
-            })}
-            {selectedCategories.map(category => (
-              <Badge key={category} variant="outline" className="flex items-center gap-1">
-                {category}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-3 w-3 p-0"
-                  onClick={() => toggleCategory(category)}
-                >
-                  <X className="h-2 w-2" />
-                </Button>
-              </Badge>
-            ))}
-            <Button variant="ghost" size="sm" onClick={onClear}>
-              すべてクリア
-            </Button>
-          </div>
-        </CardContent>
-      )}
-
-      {/* Expanded Filters */}
-      {isExpanded && (
-        <CardContent className="space-y-4">
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>フィルター</DialogTitle>
+          <DialogDescription>
+            表示する投稿を絞り込みます
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-6 py-4">
           {/* Group Filter */}
           <div>
-            <h4 className="text-sm font-medium mb-2">グループ</h4>
+            <h4 className="text-sm font-medium mb-3">グループ</h4>
             <div className="flex flex-wrap gap-2">
               {groups.map((group) => (
-                <Button
+                <Badge
                   key={group.id}
-                  variant={selectedGroups.includes(group.id) ? "default" : "outline"}
-                  size="sm"
+                  variant={selectedGroups.includes(group.id) ? 'default' : 'outline'}
+                  className="cursor-pointer transition-all hover:scale-105"
                   onClick={() => toggleGroup(group.id)}
                 >
                   {group.name}
-                </Button>
+                </Badge>
               ))}
             </div>
           </div>
 
           {/* Category Filter */}
           <div>
-            <h4 className="text-sm font-medium mb-2">カテゴリ</h4>
+            <h4 className="text-sm font-medium mb-3">カテゴリ</h4>
             <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((category) => (
-                <Button
+              {categories.map((category) => (
+                <Badge
                   key={category}
-                  variant={selectedCategories.includes(category) ? "default" : "outline"}
-                  size="sm"
+                  variant={selectedCategories.includes(category) ? 'default' : 'outline'}
+                  className="cursor-pointer transition-all hover:scale-105"
                   onClick={() => toggleCategory(category)}
                 >
                   {category}
-                </Button>
+                </Badge>
               ))}
             </div>
           </div>
-        </CardContent>
-      )}
-    </Card>
+        </div>
+
+        <div className="flex justify-between">
+          <Button variant="ghost" onClick={clearFilters}>
+            クリア
+          </Button>
+          <Button>
+            適用
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

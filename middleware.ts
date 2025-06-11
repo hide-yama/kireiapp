@@ -1,8 +1,20 @@
-import { type NextRequest } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request)
+  // Update the session first
+  const response = await updateSession(request)
+  
+  // Get the pathname
+  const pathname = request.nextUrl.pathname
+  
+  // Check if user is trying to access the dashboard
+  if (pathname === '/dashboard') {
+    // Redirect to feed instead
+    return NextResponse.redirect(new URL('/feed', request.url))
+  }
+  
+  return response
 }
 
 export const config = {

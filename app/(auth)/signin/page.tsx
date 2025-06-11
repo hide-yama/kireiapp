@@ -31,15 +31,29 @@ export default function SignInPage() {
   })
 
   const onSubmit = async (data: SignInFormData) => {
-    const result = await apiClient.signIn(data.email, data.password)
+    try {
+      const result = await apiClient.signIn(data.email, data.password)
 
-    if (result.success) {
+      if (result.success) {
+        toast({
+          title: "ログインしました",
+          description: "フィードに移動します",
+        })
+        router.push('/feed')
+      } else {
+        toast({
+          title: "ログインに失敗しました",
+          description: result.error?.message || "メールアドレスまたはパスワードが正しくありません",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error('Login error:', error)
       toast({
-        title: "ログインしました",
-        description: "ダッシュボードに移動します",
-        variant: "success",
+        title: "エラーが発生しました",
+        description: "しばらく時間をおいて再度お試しください",
+        variant: "destructive",
       })
-      router.push('/dashboard')
     }
   }
 
