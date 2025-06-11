@@ -6,7 +6,7 @@ import { ProfileAvatar } from '@/components/profile/ProfileAvatar'
 import { useScrollDirection } from '@/hooks/useScrollDirection'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
-import { Home, Users } from 'lucide-react'
+import { Home, Users, Plus } from 'lucide-react'
 
 interface MobileNavigationProps {
   userId: string
@@ -62,6 +62,11 @@ export function MobileNavigation({ userId }: MobileNavigationProps) {
         <Link href="/groups">
           <Button variant="ghost" size="sm" className="p-3 [&_svg]:size-5">
             <Users className="h-5 w-5" />
+          </Button>
+        </Link>
+        <Link href="/posts/create">
+          <Button variant="default" size="sm" className="p-3 [&_svg]:size-5 bg-primary hover:bg-primary/90">
+            <Plus className="h-5 w-5" />
           </Button>
         </Link>
         <Link href="/profile">
