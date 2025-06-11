@@ -144,7 +144,9 @@ export default function CreatePostPage() {
       if (response.ok) {
         router.push("/posts")
       } else {
-        throw new Error("投稿の作成に失敗しました")
+        const errorData = await response.json()
+        console.error("API Error:", errorData)
+        throw new Error(errorData.error || "投稿の作成に失敗しました")
       }
     } catch (error) {
       console.error("Error creating post:", error)
@@ -176,7 +178,7 @@ export default function CreatePostPage() {
                 id="group"
                 value={selectedGroup}
                 onChange={(e) => setSelectedGroup(e.target.value)}
-                className="w-full p-3 border rounded-md"
+                className="w-full p-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:border-primary focus:outline-none"
                 required
               >
                 <option value="">グループを選択</option>
@@ -194,7 +196,7 @@ export default function CreatePostPage() {
                 id="body"
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                className="w-full min-h-[120px] p-3 border rounded-md resize-vertical"
+                className="w-full min-h-[120px] p-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:border-primary focus:outline-none resize-vertical"
                 placeholder="今日の家事について書いてください..."
                 required
               />
@@ -206,7 +208,7 @@ export default function CreatePostPage() {
                 id="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full p-3 border rounded-md"
+                className="w-full p-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:border-primary focus:outline-none"
                 required
               >
                 <option value="">カテゴリを選択</option>

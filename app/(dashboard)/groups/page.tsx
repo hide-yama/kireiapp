@@ -110,20 +110,22 @@ export default function GroupsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">グループ一覧</h1>
-        <div className="flex gap-2">
-          <Button asChild>
-            <Link href="/groups/create">
-              <Plus className="w-4 h-4 mr-2" />
-              グループ作成
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/groups/join">
-              参加する
-            </Link>
-          </Button>
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <h1 className="text-2xl font-bold">グループ一覧</h1>
+          <div className="flex gap-2">
+            <Button asChild>
+              <Link href="/groups/create">
+                <Plus className="w-4 h-4 mr-2" />
+                グループ作成
+              </Link>
+            </Button>
+            <Button variant="secondary" asChild>
+              <Link href="/groups/join">
+                参加する
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -139,7 +141,7 @@ export default function GroupsPage() {
               <Button asChild>
                 <Link href="/groups/create">グループ作成</Link>
               </Button>
-              <Button variant="outline" asChild>
+              <Button variant="secondary" asChild>
                 <Link href="/groups/join">参加する</Link>
               </Button>
             </div>

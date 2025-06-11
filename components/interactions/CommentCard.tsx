@@ -77,10 +77,10 @@ export function CommentCard({ comment, currentUserId, onDeleted }: CommentCardPr
       />
       <div className="flex-1 min-w-0">
         <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium text-gray-900">
+          <span className="text-sm font-medium text-white">
             {comment.profiles?.nickname || 'Unknown User'}
           </span>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-300">
             {formatDate(comment.created_at)}
           </span>
           {currentUserId === comment.user_id && (
@@ -95,7 +95,7 @@ export function CommentCard({ comment, currentUserId, onDeleted }: CommentCardPr
             </Button>
           )}
         </div>
-        <p className="text-sm text-gray-700 mt-1 break-words">
+        <p className="text-sm text-white mt-1 break-words">
           {comment.body}
         </p>
       </div>

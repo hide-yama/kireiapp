@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
     const body = formData.get("body") as string
     const category = formData.get("category") as string
     const place = formData.get("place") as string
+    const groupId = formData.get("group_id") as string
 
     if (!body || !category) {
       return NextResponse.json(
@@ -22,26 +23,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    let targetGroupId = groupId
 
-    // Get user's active group (assuming user has one group for now)
-    const { data: memberData, error: memberError } = await supabase
-      .from("family_members")
-      .select("group_id")
-      .eq("user_id", user.id)
-      .single()
+    // If no group_id provided, get user's first group
+    if (!targetGroupId) {
+      const { data: memberData, error: memberError } = await supabase
+        .from("family_members")
+        .select("group_id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .maybeSingle()
 
-    if (memberError || !memberData) {
-      return NextResponse.json(
-        { error: "User not in any group" },
-        { status: 400 }
-      )
+      if (memberError || !memberData) {
+        return NextResponse.json(
+          { error: "User not in any group" },
+          { status: 400 }
+        )
+      }
+      targetGroupId = memberData.group_id
     }
 
     // Create post
     const { data: post, error: postError } = await supabase
       .from("posts")
       .insert({
-        group_id: memberData.group_id,
+        group_id: targetGroupId,
         user_id: user.id,
         body,
         category,

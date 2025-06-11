@@ -7,13 +7,13 @@ export default function Home() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold">キレイにできるもん</CardTitle>
+          <CardTitle className="text-3xl font-bold">きれいにできるもん</CardTitle>
           <CardDescription className="text-lg">
             家族で家事をシェアして、感謝を伝え合おう
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2 text-center text-muted-foreground">
+          <div className="space-y-2 text-center text-gray-600 dark:text-gray-300">
             <p>家事を写真付きで投稿</p>
             <p>家族からいいねやコメントをもらおう</p>
             <p>みんなで家事を楽しく共有</p>

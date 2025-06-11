@@ -119,6 +119,18 @@ export class PostService {
             .eq('post_id', post.id)
             .order('position')
 
+          // いいね数とコメント数を取得
+          const [{ count: like_count }, { count: comment_count }] = await Promise.all([
+            this.supabase
+              .from('likes')
+              .select('*', { count: 'exact', head: true })
+              .eq('post_id', post.id),
+            this.supabase
+              .from('comments')
+              .select('*', { count: 'exact', head: true })
+              .eq('post_id', post.id)
+          ])
+
           return {
             ...post,
             profile: profile || { id: post.user_id, nickname: 'Unknown User', avatar_url: null },
@@ -127,8 +139,8 @@ export class PostService {
               ...image,
               url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/post-images/${image.storage_path}`
             })),
-            like_count: 0,
-            comment_count: 0
+            like_count: like_count || 0,
+            comment_count: comment_count || 0
           } as PostWithDetails
         })
       )
@@ -200,6 +212,30 @@ export class PostService {
         .eq('post_id', data.id)
         .order('position')
 
+      // いいね数とコメント数を取得
+      const [{ count: like_count }, { count: comment_count }] = await Promise.all([
+        this.supabase
+          .from('likes')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', data.id),
+        this.supabase
+          .from('comments')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', data.id)
+      ])
+
+      // ユーザーがいいねしているかチェック
+      let is_liked = false
+      if (userId) {
+        const { data: likeData } = await this.supabase
+          .from('likes')
+          .select('id')
+          .eq('post_id', data.id)
+          .eq('user_id', userId)
+          .maybeSingle()
+        is_liked = !!likeData
+      }
+
       // データを変換
       const postWithDetails = {
         ...data,
@@ -209,9 +245,9 @@ export class PostService {
           ...image,
           url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/post-images/${image.storage_path}`
         })),
-        like_count: 0, // 別途取得
-        comment_count: 0, // 別途取得
-        is_liked: false // 別途取得
+        like_count: like_count || 0,
+        comment_count: comment_count || 0,
+        is_liked
       } as PostWithDetails
 
       return { data: postWithDetails, error: null }

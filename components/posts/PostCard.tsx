@@ -1,9 +1,13 @@
-import React, { memo } from "react"
+'use client'
+
+import React, { memo, useState } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LikeButton } from "@/components/interactions/LikeButton"
-import { MessageCircle, MoreHorizontal, MapPin } from "lucide-react"
+import { CommentForm } from "@/components/interactions/CommentForm"
+import { CommentList } from "@/components/interactions/CommentList"
+import { MessageCircle, MoreHorizontal, MapPin, X } from "lucide-react"
 import { PostWithDetails } from "@/types/domain"
 import { formatDate, getCategoryColor, isValidImageUrl } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
@@ -19,61 +23,79 @@ const PostCardComponent = ({ post, currentUserId }: PostCardProps) => {
   
   // 画像URLの安全性チェック
   const safeImageUrl = firstImage?.url && isValidImageUrl(firstImage.url) ? firstImage.url : null
+  
+  // 本文が長いかチェック
+  const textLength = post.body.length
+  const isLongText = textLength > 30
+  
+  // 展開状態の管理
+  const [isExpanded, setIsExpanded] = useState(false)
+  
+  // コメントモーダルの表示状態
+  const [showCommentModal, setShowCommentModal] = useState(false)
+  
+  // コメント更新トリガー
+  const [commentRefreshTrigger, setCommentRefreshTrigger] = useState(0)
+  
+  // ローカルコメント数の管理
+  const [localCommentCount, setLocalCommentCount] = useState(post.comment_count || 0)
 
   return (
-    <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300">
-      <CardHeader className="pb-3">
+    <div className="border-b border-gray-800 pb-4 mb-4">
+      <div className="mb-3">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
-            <Link href={`/profile`} className="group">
-              <div className="relative">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center overflow-hidden ring-2 ring-transparent group-hover:ring-primary/30 transition-all duration-200">
-                  {post.profile?.avatar_url ? (
-                    <img
-                      src={post.profile.avatar_url}
-                      alt="Avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-base font-semibold text-primary">
-                      {post.profile?.nickname?.[0] || "?"}
-                    </span>
-                  )}
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full ring-2 ring-white dark:ring-gray-900" />
+            <Link href={`/profile`}>
+              <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
+                {post.profile?.avatar_url ? (
+                  <img
+                    src={post.profile.avatar_url}
+                    alt="Avatar"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  <span className="text-sm font-medium text-gray-300">
+                    {post.profile?.nickname?.[0] || "?"}
+                  </span>
+                )}
               </div>
             </Link>
             <div>
-              <p className="font-semibold text-foreground hover:text-primary transition-colors">
+              <p className="font-medium text-white">
                 {post.profile?.nickname}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-gray-400">
                 {formatDate(post.created_at)}
               </p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" className="rounded-full -mr-2">
+          <button className="p-2 text-gray-400 hover:text-white">
             <MoreHorizontal className="h-4 w-4" />
-          </Button>
+          </button>
         </div>
-      </CardHeader>
+      </div>
       
-      <CardContent className="space-y-4">
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="default" className="text-xs">
-            {post.category}
-          </Badge>
-          {post.place && (
-            <Badge variant="outline" className="text-xs gap-1">
-              <MapPin className="h-3 w-3" />
-              {post.place}
-            </Badge>
+      <div className="space-y-3">
+        {post.place && (
+          <p className="text-sm text-gray-400 flex items-center gap-1">
+            <MapPin className="h-3 w-3" />
+            {post.place}
+          </p>
+        )}
+        
+        <div>
+          <p className="text-white leading-relaxed whitespace-pre-wrap">
+            {isLongText && !isExpanded ? post.body.substring(0, 30) + '...' : post.body}
+          </p>
+          {isLongText && !isExpanded && (
+            <button 
+              onClick={() => setIsExpanded(true)}
+              className="text-gray-400 hover:text-white text-sm mt-1 inline-block"
+            >
+              続きを読む
+            </button>
           )}
         </div>
-        
-        <p className="text-sm leading-relaxed whitespace-pre-wrap line-clamp-3">
-          {post.body}
-        </p>
         
         {safeImageUrl && (
           <div className="relative group cursor-pointer">
@@ -97,28 +119,76 @@ const PostCardComponent = ({ post, currentUserId }: PostCardProps) => {
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between pt-3">
           <div className="flex items-center gap-1">
             <LikeButton
               postId={post.id}
               initialLikeCount={post.like_count || 0}
               userId={currentUserId}
             />
-            <Button variant="ghost" size="sm" asChild className="rounded-full">
-              <Link href={`/posts/${post.id}`} className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="rounded-full"
+              onClick={() => setShowCommentModal(true)}
+            >
+              <div className="flex items-center gap-2">
                 <MessageCircle className="h-5 w-5" />
-                <span className="text-sm font-medium">{post.comment_count || 0}</span>
-              </Link>
+                <span className="text-sm font-medium">{localCommentCount}</span>
+              </div>
             </Button>
           </div>
-          <Link href={`/posts/${post.id}`}>
-            <Button variant="ghost" size="sm" className="text-xs hover:text-primary">
-              続きを読む
-            </Button>
-          </Link>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      
+      {/* コメントモーダル */}
+      {showCommentModal && (
+        <div className="fixed inset-0 z-50 flex items-end">
+          {/* オーバーレイ */}
+          <div 
+            className="absolute inset-0 bg-black/50" 
+            onClick={() => setShowCommentModal(false)}
+          />
+          
+          {/* モーダルコンテンツ */}
+          <div className="relative w-full bg-gray-900 rounded-t-xl border-t border-gray-700 max-h-[80vh] flex flex-col animate-slide-up">
+            {/* ヘッダー */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-700">
+              <h3 className="text-lg font-semibold text-white">コメント</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowCommentModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            {/* コメント一覧エリア */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <CommentList 
+                postId={post.id} 
+                currentUserId={currentUserId}
+                refreshTrigger={commentRefreshTrigger}
+              />
+            </div>
+            
+            {/* コメント入力フォーム - 固定 */}
+            <div className="border-t border-gray-700 p-4 bg-gray-900">
+              <CommentForm 
+                postId={post.id} 
+                userId={currentUserId}
+                onCommentAdded={() => {
+                  setCommentRefreshTrigger(prev => prev + 1)
+                  setLocalCommentCount(prev => prev + 1)
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 

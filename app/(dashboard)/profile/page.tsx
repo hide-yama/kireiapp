@@ -146,6 +146,21 @@ export default function ProfilePage() {
                 キャンセル
               </Button>
             </div>
+
+            <div className="pt-6 border-t">
+              <Button 
+                type="button" 
+                variant="destructive" 
+                onClick={async () => {
+                  await supabase.auth.signOut()
+                  router.push('/signin')
+                }}
+                disabled={loading}
+                className="w-full"
+              >
+                ログアウト
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>

@@ -61,7 +61,7 @@ export default function SignUpPage() {
       <CardHeader>
         <CardTitle>アカウント作成</CardTitle>
         <CardDescription>
-          キレイにできるもんで家族と家事をシェアしよう
+          きれいにできるもんで家族と家事をシェアしよう
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>

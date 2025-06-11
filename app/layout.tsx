@@ -3,6 +3,7 @@ import { Inter, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,13 +19,13 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "キレイにできるもん",
+  title: "きれいにできるもん",
   description: "家族の家事を共有するアプリ",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "キレイにできるもん",
+    title: "きれいにできるもん",
   },
 };
 
@@ -42,17 +43,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className={`${inter.variable} ${notoSansJP.variable}`}>
-      <body className="antialiased min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 text-foreground">
-        <ErrorBoundary>
-          <div className="relative min-h-screen">
-            <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
-            <div className="relative z-10">
-              {children}
+    <html lang="ja" className={`${inter.variable} ${notoSansJP.variable} dark`}>
+      <body className="antialiased min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+        <ThemeProvider defaultTheme="dark">
+          <ErrorBoundary>
+            <div className="relative min-h-screen">
+              <div className="fixed inset-0 bg-gradient-to-br from-purple-900/10 via-transparent to-blue-900/10 pointer-events-none" />
+              <div className="relative z-10">
+                {children}
+              </div>
             </div>
-          </div>
-        </ErrorBoundary>
-        <Toaster />
+          </ErrorBoundary>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
