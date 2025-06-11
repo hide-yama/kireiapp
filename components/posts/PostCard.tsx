@@ -2,15 +2,14 @@
 
 import React, { memo, useState } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LikeButton } from "@/components/interactions/LikeButton"
 import { CommentForm } from "@/components/interactions/CommentForm"
 import { CommentList } from "@/components/interactions/CommentList"
 import { MessageCircle, MoreHorizontal, MapPin, X } from "lucide-react"
 import { PostWithDetails } from "@/types/domain"
-import { formatDate, getCategoryColor, isValidImageUrl } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
+import { formatDate, isValidImageUrl } from "@/lib/utils"
 
 interface PostCardProps {
   post: PostWithDetails

@@ -7,7 +7,7 @@ import { PostCard } from '@/components/posts/PostCard'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Loading } from '@/components/ui/loading'
-import { Plus, Sparkles } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { PostWithDetails } from '@/types/domain'
 
