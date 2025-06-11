@@ -44,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" className={`${inter.variable} ${notoSansJP.variable}`}>
-      <body className="antialiased min-h-screen">
+      <body className="antialiased min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
         <ThemeProvider defaultTheme="system">
           <ErrorBoundary>
             <div className="relative min-h-screen">
