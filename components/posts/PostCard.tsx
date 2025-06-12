@@ -126,42 +126,40 @@ const PostCardComponent = ({ post, currentUserId }: PostCardProps) => {
               </p>
             </div>
           </div>
-          <div className="relative" ref={menuRef}>
-            <button 
-              className="p-2 text-gray-400 hover:text-white"
-              onClick={() => setShowMenu(!showMenu)}
-            >
-              <MoreHorizontal className="h-4 w-4" />
-            </button>
+          {currentUserId === post.user_id && (
+            <div className="relative" ref={menuRef}>
+              <button 
+                className="p-2 text-gray-400 hover:text-white"
+                onClick={() => setShowMenu(!showMenu)}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </button>
             
             {/* ドロップダウンメニュー */}
             {showMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-10">
-                {currentUserId === post.user_id && (
-                  <>
-                    <button
-                      className="w-full px-4 py-2 text-left text-white hover:bg-gray-700 flex items-center gap-2 rounded-t-lg"
-                      onClick={() => {
-                        router.push(`/posts/${post.id}/edit`)
-                        setShowMenu(false)
-                      }}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                      編集
-                    </button>
-                    <button
-                      className="w-full px-4 py-2 text-left text-red-400 hover:bg-gray-700 flex items-center gap-2 rounded-b-lg"
-                      onClick={handleDelete}
-                      disabled={isDeleting}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      {isDeleting ? "削除中..." : "削除"}
-                    </button>
-                  </>
-                )}
+              <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50">
+                <button
+                  className="w-full px-4 py-2 text-left text-white hover:bg-gray-700 flex items-center gap-2 rounded-t-lg"
+                  onClick={() => {
+                    router.push(`/posts/${post.id}/edit`)
+                    setShowMenu(false)
+                  }}
+                >
+                  <Edit2 className="h-4 w-4" />
+                  編集
+                </button>
+                <button
+                  className="w-full px-4 py-2 text-left text-red-400 hover:bg-gray-700 flex items-center gap-2 rounded-b-lg"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {isDeleting ? "削除中..." : "削除"}
+                </button>
               </div>
             )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
       
