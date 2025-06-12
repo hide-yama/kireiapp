@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { FileInput } from "@/components/ui/file-input"
 import { compressImage } from "@/lib/image-utils"
 import { createClient } from "@/lib/supabase/client"
 
@@ -233,9 +234,8 @@ export default function CreatePostPage() {
 
             <div>
               <Label htmlFor="images">画像（最大4枚）</Label>
-              <Input
+              <FileInput
                 id="images"
-                type="file"
                 accept="image/*"
                 multiple
                 onChange={handleImageUpload}

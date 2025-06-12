@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { FileInput } from "@/components/ui/file-input"
 import { createClient } from "@/lib/supabase/client"
 
 const categories = ["料理", "掃除", "洗濯", "買い物", "その他"] as const
@@ -273,9 +274,8 @@ export default function EditPostPage() {
               )}
 
               <Label htmlFor="newImages">新しい画像を追加</Label>
-              <Input
+              <FileInput
                 id="newImages"
-                type="file"
                 accept="image/*"
                 multiple
                 onChange={handleNewImageUpload}
