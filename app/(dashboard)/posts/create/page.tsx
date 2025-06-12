@@ -239,8 +239,14 @@ export default function CreatePostPage() {
                 accept="image/*"
                 multiple
                 onChange={handleImageUpload}
-                className="mb-3"
+                className="mb-2"
               />
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                {images.length > 0 
+                  ? `選択されたファイル: ${images.map(img => img.name).join(', ')}`
+                  : 'ファイルが選択されていません'
+                }
+              </p>
               
               {images.length > 0 && (
                 <div className="grid grid-cols-2 gap-3">
