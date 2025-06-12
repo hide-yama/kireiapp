@@ -75,25 +75,24 @@ export function ImageSlider({ images, className = '' }: ImageSliderProps) {
 
   if (images.length === 1) {
     return (
-      <div className={`relative group cursor-pointer ${className}`}>
+      <div className={`relative ${className}`}>
         <div className="aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
           <img
             src={images[0].url}
             alt={images[0].alt || '投稿画像'}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover"
             loading="lazy"
             onError={(e) => {
               e.currentTarget.style.display = 'none'
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
       </div>
     )
   }
 
   return (
-    <div className={`relative group cursor-pointer ${className}`}>
+    <div className={`relative group ${className}`}>
       <div 
         ref={sliderRef}
         className="aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 relative"
@@ -121,8 +120,6 @@ export function ImageSlider({ images, className = '' }: ImageSliderProps) {
           ))}
         </div>
 
-        {/* オーバーレイ */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* 左矢印ボタン */}
         {currentIndex > 0 && (
